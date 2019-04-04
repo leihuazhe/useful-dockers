@@ -1,0 +1,121 @@
+version: '2'
+services:
+  namenode:
+    image: uhopper/hadoop-namenode:2.8.1
+    hostname: namenode
+    container_name: namenode
+    domainname: hadoop
+    networks:
+      - hadoop
+    volumes:
+      - /namenode:/hadoop/dfs/name
+    environment:
+      - CLUSTER_NAME=datanode1
+      - CLUSTER_NAME=datanode2
+      - CLUSTER_NAME=datanode3
+    ports:
+      - 8020:8020
+      - 50070:50070
+      - 50470:50470
+
+  datanode1:
+    image: uhopper/hadoop-datanode:2.8.1
+    hostname: datanode1
+    container_name: datanode1
+    domainname: hadoop
+    networks:
+      - hadoop
+    volumes:
+      - /datanode1:/hadoop/dfs/data
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+#    ports:
+#      - 50010:50010
+#      - 50020:50020
+#      - 50075:50075
+#      - 50475:50475
+
+  datanode2:
+    image: uhopper/hadoop-datanode:2.8.1
+    hostname: datanode2
+    container_name: datanode2
+    domainname: hadoop
+    networks:
+      - hadoop
+    volumes:
+      - /datanode2:/hadoop/dfs/data
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+#    ports:
+#      - 50010:50010
+#      - 50020:50020
+#      - 50075:50075
+#      - 50475:50475
+
+  datanode3:
+    image: uhopper/hadoop-datanode:2.8.1
+    hostname: datanode3
+    container_name: datanode3
+    domainname: hadoop
+    networks:
+      - hadoop
+    volumes:
+      - /datanode3:/hadoop/dfs/data
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+#    ports:
+#      - 50010:50010
+#      - 50020:50020
+#      - 50075:50075
+#      - 50475:50475
+
+
+  resourcemanager:
+    image: uhopper/hadoop-resourcemanager:2.8.1
+    hostname: resourcemanager
+    container_name: resourcemanager
+    domainname: hadoop
+    networks:
+      - hadoop
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+      - YARN_CONF_yarn_log___aggregation___enable=true
+    ports:
+      - 8030:8030
+      - 8031:8031
+      - 8032:8032
+      - 8033:8033
+      - 8088:8088
+
+  nodemanager:
+    image: uhopper/hadoop-nodemanager:2.8.1
+    hostname: nodemanager
+    container_name: nodemanager
+    domainname: hadoop
+    networks:
+      - hadoop
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+      - YARN_CONF_yarn_resourcemanager_hostname=resourcemanager
+      - YARN_CONF_yarn_log___aggregation___enable=true
+      - YARN_CONF_yarn_nodemanager_remote___app___log___dir=/app-logs
+    ports:
+      - 8040:8040
+      - 8041:8041
+      - 8042:8042
+
+#  spark:
+#    image: uhopper/hadoop-spark:2.8.1
+#    hostname: spark
+#    container_name: spark
+#    domainname: hadoop
+#    networks:
+#      - hadoop
+#    environment:
+#      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+#      - YARN_CONF_yarn_resourcemanager_hostname=resourcemanager
+#    command: tail -f /var/log/dmesg
+
+
+networks:
+  hadoop:

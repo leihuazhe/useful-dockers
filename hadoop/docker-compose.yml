@@ -4,7 +4,7 @@ services:
     image: uhopper/hadoop-namenode:2.8.1
     hostname: namenode
     container_name: namenode
-    domainname: hadoop
+#    domainname: hadoop
     networks:
       - hadoop
     volumes:
@@ -13,6 +13,8 @@ services:
       - CLUSTER_NAME=datanode1
       - CLUSTER_NAME=datanode2
       - CLUSTER_NAME=datanode3
+      #      配置 hdfs 用户权限问题
+      - HDFS_CONF_dfs_permissions=false
     ports:
       - 8020:8020
       - 50070:50070
@@ -22,59 +24,65 @@ services:
     image: uhopper/hadoop-datanode:2.8.1
     hostname: datanode1
     container_name: datanode1
-    domainname: hadoop
+#    domainname: hadoop
     networks:
       - hadoop
     volumes:
       - /datanode1:/hadoop/dfs/data
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
-#    ports:
-#      - 50010:50010
-#      - 50020:50020
-#      - 50075:50075
-#      - 50475:50475
+      - HDFS_CONF_dfs_datanode_address=0.0.0.0:50010
+      - HDFS_CONF_dfs_datanode_ipc_address=0.0.0.0:50020
+      - HDFS_CONF_dfs_datanode_http_address=0.0.0.0:50075
+    ports:
+      - 50010:50010
+      - 50020:50020
+      - 50075:50075
 
   datanode2:
     image: uhopper/hadoop-datanode:2.8.1
     hostname: datanode2
     container_name: datanode2
-    domainname: hadoop
+#    domainname: hadoop
     networks:
       - hadoop
     volumes:
       - /datanode2:/hadoop/dfs/data
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
-#    ports:
-#      - 50010:50010
-#      - 50020:50020
-#      - 50075:50075
-#      - 50475:50475
+      - HDFS_CONF_dfs_datanode_address=0.0.0.0:50012
+      - HDFS_CONF_dfs_datanode_ipc_address=0.0.0.0:50022
+      - HDFS_CONF_dfs_datanode_http_address=0.0.0.0:50072
+    ports:
+      - 50012:50012
+      - 50022:50022
+      - 50072:50072
 
   datanode3:
     image: uhopper/hadoop-datanode:2.8.1
     hostname: datanode3
     container_name: datanode3
-    domainname: hadoop
+#    domainname: hadoop
     networks:
       - hadoop
     volumes:
       - /datanode3:/hadoop/dfs/data
     environment:
       - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
-#    ports:
-#      - 50010:50010
-#      - 50020:50020
-#      - 50075:50075
-#      - 50475:50475
+      - HDFS_CONF_dfs_datanode_address=0.0.0.0:50013
+      - HDFS_CONF_dfs_datanode_ipc_address=0.0.0.0:50023
+      - HDFS_CONF_dfs_datanode_http_address=0.0.0.0:50073
+    ports:
+      - 50013:50013
+      - 50023:50023
+      - 50073:50073
 
 
   resourcemanager:
     image: uhopper/hadoop-resourcemanager:2.8.1
     hostname: resourcemanager
     container_name: resourcemanager
-    domainname: hadoop
+#    domainname: hadoop
     networks:
       - hadoop
     environment:
@@ -91,7 +99,7 @@ services:
     image: uhopper/hadoop-nodemanager:2.8.1
     hostname: nodemanager
     container_name: nodemanager
-    domainname: hadoop
+#    domainname: hadoop
     networks:
       - hadoop
     environment:
@@ -104,17 +112,17 @@ services:
       - 8041:8041
       - 8042:8042
 
-#  spark:
-#    image: uhopper/hadoop-spark:2.8.1
-#    hostname: spark
-#    container_name: spark
+  spark:
+    image: uhopper/hadoop-spark:2.1.2_2.8.1
+    hostname: spark
+    container_name: spark
 #    domainname: hadoop
-#    networks:
-#      - hadoop
-#    environment:
-#      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
-#      - YARN_CONF_yarn_resourcemanager_hostname=resourcemanager
-#    command: tail -f /var/log/dmesg
+    networks:
+      - hadoop
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+      - YARN_CONF_yarn_resourcemanager_hostname=resourcemanager
+    command: tail -f /var/log/dmesg
 
 
 networks:

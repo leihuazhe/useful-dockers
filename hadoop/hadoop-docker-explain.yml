@@ -2,6 +2,7 @@ version: '2'
 services:
   namenode:
     image: uhopper/hadoop-namenode:2.8.1
+    # 配置好 docker 内的假域名
     hostname: namenode
     container_name: namenode
     networks:
@@ -13,11 +14,14 @@ services:
       - CLUSTER_NAME=datanode1
       - CLUSTER_NAME=datanode2
       - CLUSTER_NAME=datanode3
-      # 配置 hdfs 用户权限问题
+      # 配置 hdfs 用户权限问题,不需要只允许 hadoop 用户访问
       - HDFS_CONF_dfs_permissions=false
     ports:
+      # 接收Client连接的RPC端口，用于获取文件系统metadata信息
       - 8020:8020
+      # nameNode http服务的端口
       - 50070:50070
+      # nameNode https 服务的端口
       - 50470:50470
 
   datanode1:
@@ -29,9 +33,13 @@ services:
     volumes:
       - /datanode1:/hadoop/dfs/data
     environment:
+      # 等价于在 core-site.xml 中配置 fs.defaultFS
       - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+      # 等价于在 hdfs-site.xml 中配置 dfs.datanode.address
       - HDFS_CONF_dfs_datanode_address=0.0.0.0:50010
+      # dfs.datanode.ipc.address 不使用默认端口的意义是在同一机器起多个 datanode，暴露端口需要不同
       - HDFS_CONF_dfs_datanode_ipc_address=0.0.0.0:50020
+      # dfs.datanode.http.address
       - HDFS_CONF_dfs_datanode_http_address=0.0.0.0:50075
     ports:
       - 50010:50010
